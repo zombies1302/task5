@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from 'react-redux';
 import { actQuantityItem } from "../actions/actCart";
+import { Confirm } from 'notiflix/build/notiflix-confirm-aio';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 function Cart(props) {
   useEffect(() => {
@@ -13,138 +15,166 @@ function Cart(props) {
       document.body.removeChild(script);
     }
   }, []);
-
+  const [seed, setSeed] = useState(1);
+  const reset = () => {
+    setSeed(Math.random());
+  }
 
   const handelQuantity = (definition, id) => {
     if (definition === "+") {
-
-
       props.cart.map((item, key) => {
         if (item._id == id) {
           props.cart[key].quantity++;
           props.editItemCart(props.cart)
+          reset()
+
         }
       })
     } else {
       props.cart.map((item, key) => {
-
         if (item._id == id) {
-          props.cart[key].quantity--;
-          console.log(props.cart)
+          if (props.cart[key].quantity > 1) {
+            props.cart[key].quantity--;
+            console.log(props.cart)
+            props.editItemCart(props.cart)
+            reset()
 
-
-
-          props.editItemCart(props.cart)
-
+          } else {
+            deleteItem(key)
+          }
         }
       })
-
     }
-
+  }
+  const deleteItem = (key)=>{
+    Confirm.show(
+      'Thông báo!',
+      'Bạn có muốn xóa sản phẩm này không ?',
+      'Có',
+      'Không',
+      () => {
+                // click có return
+                props.cart.splice(key, 1);
+                props.editItemCart(props.cart)
+                Notify.failure('Xoá khỏi giỏ hàng thành công');
+                reset()
+              },
+              () => {
+                // click không  return
+              },{},);
 
   }
 
-
   const onChangeItem = (id) => {
     console.log(id)
-
   }
   let listCart = [];
   let Total = props.cart.reduce((acc, curr) => acc + curr.quantity * curr.price, 0);
 
   props.cart.forEach((s, index) => {
-
     listCart.push(
       <tr key={index}>
-        <td><img style={{ width: '60px' }} src={'/assets/image/' + s.images} alt="" /></td>
-        <td>
-          <div><p>{s.name}</p></div>
-        </td>
-        <td><h5>{s.price.toLocaleString('vi-VN')}đ</h5></td>
-        <td>
-          <div className="product_count">
-            <input onChange={() => onChangeItem(s._id)} type="text" name="qty" id="sst" maxLength={12} defaultValue={s.quantity} title="Quantity:" className="input-text qty" />
-            <button className="increase items-count" type="button" onClick={() => handelQuantity("+", s._id)}><i className="lnr lnr-chevron-up" /></button>
-            <button className="reduced items-count" type="button" onClick={() => handelQuantity("-", s._id)}><i className="lnr lnr-chevron-down" /></button></div></td>
-        <td><h5>{(s.quantity * s.price).toLocaleString('vi-VN')}đ</h5></td>
+      <td>
+      <div className="media">
+      <div className="d-flex">
+      <img style={{ maxWidth: '80px' }} src={'/assets/image/' + s.images} alt="" />
+      </div>
+      <div className="media-body text-danger">
+      <strong><NavLink to={"/product/" + s._id}>{s.name}</NavLink></strong>
+      </div>
+      </div>
+      </td>
+      <td><h5>{s.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5></td>
+      <td>
+      <div className="product_count">
+      <input onChange={() => onChangeItem(s._id)} type="text" name="qty" id="sst" maxLength={12} value={s.quantity} title="Quantity:" className="input-text qty" />
+      <button className="increase items-count" type="button" onClick={() => handelQuantity("+", s._id)}><i className="lnr lnr-chevron-up" /></button>
+      <button className="reduced items-count" type="button" onClick={() => handelQuantity("-", s._id)}><i className="lnr lnr-chevron-down" /></button>
+      </div>
+      </td>
+      <td>
+      <h5>{(s.price * s.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5>
+      </td>
+      <td>
+      <button className="btn btn-sm btn-outline-danger" onClick={() => deleteItem(index)}>Xóa</button>
+      </td>
       </tr>
-    );
+      );
   });
-
-
 
   return (
     <div>
-      {/* Start Banner Area */}
-      <section className="banner-area organic-breadcrumb">
-        <div className="container">
-          <div className="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
-            <div className="col-first">
-              <h1>Giỏ Hàng</h1>
-              <nav className="d-flex align-items-center">
-                <NavLink exact="true" activeclass="active " to="/" className="nav-item">
-                  Trang chủ <span className="lnr lnr-arrow-right"></span>
-                </NavLink>
-                <a href="#a">Giỏ Hàng</a>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </section>
+  {/* Start Banner Area */}
+  <section className="banner-area organic-breadcrumb">
+  <div className="container">
+  <div className="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+  <div className="col-first">
+  <h1>Giỏ Hàng</h1>
+  <nav className="d-flex align-items-center">
+  <NavLink exact="true" activeclass="active " to="/" className="nav-item">
+  Trang chủ <span className="lnr lnr-arrow-right"></span>
+  </NavLink>
+  <a href="#a">Giỏ Hàng</a>
+  </nav>
+  </div>
+  </div>
+  </div>
+  </section>
 
-      {/* End Banner Area */}
-      {/*================Cart Area =================*/}
-      <section className="cart_area">
-        <div className="container">
-          <div className="cart_inner">
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Hình Ảnh</th>
-                    <th scope="col">Sản Phẩm</th>
-                    <th scope="col">Giá</th>
-                    <th scope="col">Số Lượng</th>
-                    <th scope="col">Thành Tiền</th>
-                  </tr>
-                </thead>
-                <tbody>
+{/* End Banner Area */}
+{/*================Cart Area =================*/}
+<section className="cart_area">
+<div className="container">
+<div className="cart_inner">
+<div className="table-responsive">
+<table className="table">
+<thead>
+<tr>
+<th scope="col">Sản phẩm</th>
+<th scope="col">Giá</th>
+<th scope="col">Số lượng</th>
+<th scope="col">Tổng</th>
+<th scope="col"></th>
+</tr>
+</thead>
+<tbody>
+{listCart}
+<tr className="bottom_button">
+<td>
+<button className="gray_btn" onClick={reset}>
+Cập nhật giỏ hàng
+</button>
+</td>
+<td></td>
+<td></td>
+<td>
+{/* <div className="cupon_text d-flex align-items-center">
+<input type="text" placeholder="Coupon Code" />
+<a className="primary-btn" href="#">
+Apply
+</a>
+<a className="gray_btn" href="#">
+Close Coupon
+</a>
+</div> */}
+</td>
+</tr>
+<tr>
+<td>
 
+</td>
+<td>
 
-                  {listCart}
-
-
-                  <tr className="bottom_button">
-                    <td>
-                      <a className="gray_btn" href="#">
-                        Update Cart
-                      </a>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <div className="cupon_text d-flex align-items-center">
-                        <input type="text" placeholder="Coupon Code" />
-                        <a className="primary-btn" href="#">
-                          Apply
-                        </a>
-                        <a className="gray_btn" href="#">
-                          Close Coupon
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <h5>Tổng Cộng</h5>
-                    </td>
-                    <td>
-                      <h5>{Total.toLocaleString('vi-VN')}</h5>
-                    </td>
-                  </tr>
-                  <tr className="shipping_area">
+</td>
+<td>
+<h5>Tổng tiền</h5>
+</td>
+<td>
+<h5>{Total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5>
+</td>
+<td></td>
+</tr>
+                  {/* <tr className="shipping_area">
                     <td></td>
                     <td></td>
                     <td>
@@ -186,49 +216,50 @@ function Cart(props) {
                         </a>
                       </div>
                     </td>
-                  </tr>
+                  </tr> */}
                   <tr className="out_button_area">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <div className="checkout_btn_inner d-flex align-items-center">
-                        <NavLink to="/shop" className="gray_btn">
-                          Tiếp tục mua hàng
-                        </NavLink>
-                        <NavLink to="/checkout" className="primary-btn">
-                          Đến trang thanh toán
-                        </NavLink>
-                      </div>
-                    </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>
+                  <div className="checkout_btn_inner d-flex align-items-center">
+                  <NavLink to="/shop" className="gray_btn">
+                  Mua thêm
+                  </NavLink>
+                  <NavLink to="/checkout" className="primary-btn">
+                  Thanh toán
+                  </NavLink>
+                  </div>
+                  </td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/*================End Cart Area =================*/}
+                  </tbody>
+                  </table>
+                  </div>
+                  </div>
+                  </div>
+                  </section>
 
-    </div>
-  )
-}
+                {/*================End Cart Area =================*/}
+
+                </div>
+                )
+              }
 
 
-const mapDispatch = (dispatch) => {
-  return {
-    editItemCart: (data) => {
-      dispatch(actQuantityItem(data))
-    }
-  };
-};
+              const mapDispatch = (dispatch) => {
+                return {
+                  editItemCart: (data) => {
+                    dispatch(actQuantityItem(data))
+                  }
+                };
+              };
 
-const mapState = (state) => {
-  return {
-    cart: state.cart
-  };
-};
-export default connect(mapState, mapDispatch)(Cart);
+              const mapState = (state) => {
+                return {
+                  cart: state.cart
+                };
+              };
+              export default connect(mapState, mapDispatch)(Cart);
 
 
 

@@ -9,9 +9,7 @@
     "rewrites": [ {
       "source": "**",
       "destination": "/index.html",
-      "run": {
-        "region": "asia-east2"
-      }
+      "region": "asia-east2"
     } ]
   }
 }

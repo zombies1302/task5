@@ -1,4 +1,60 @@
-function Checkout() {
+import { NavLink } from "react-router-dom";
+import { useRef, useEffect } from "react";
+import { connect } from "react-redux";
+
+import LocationSelect from "./add-in/locationSelect";
+
+function Checkout(props) {
+   useEffect(() => {
+      console.log(props.itemInCart);
+
+      const script = document.createElement('script');
+      script.src = "/assets/js/main.js";
+      script.async = true;
+      document.body.appendChild(script);
+      return () => {
+         document.body.removeChild(script);
+      }
+   }, []);
+
+   // ref
+   const refCustomerName = useRef();
+   const refCustomerPhone = useRef();
+   const refCustomerEmail = useRef();
+   const refCustomerAddress = useRef();
+   const refCustomerNote = useRef();
+   const checkout = () => {
+      if (refCustomerName.current.value === "" && refCustomerPhone.current.value === "" && refCustomerEmail.current.value === "" && refCustomerAddress.current.value === "") {
+         alert('Vui lòng nhập đầy đủ thông tin');
+      } else {
+         let data = {
+            name: refCustomerName.current.value,
+            phone: refCustomerPhone.current.value,
+            email: refCustomerEmail.current.value,
+            address: refCustomerAddress.current.value,
+            note: refCustomerNote.current.value,
+            products: props.itemInCart,
+            time: new Date().toLocaleString()
+         }
+         console.log(data);
+         document.getElementById('customer-info-form').reset();
+      }
+   };
+
+
+   let itemForCheckout = [];
+   let Total = props.itemInCart.reduce((acc, curr) => acc + curr.quantity * curr.price, 0);
+
+   props.itemInCart.forEach((i, index) => {
+      itemForCheckout.push(
+         <li key={index}>
+            <NavLink to={"/product/"+i._id}>
+               {i.name} <span className="middle">x {i.quantity}</span>{" "}
+               <span className="last">{(i.price * i.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+            </NavLink>
+         </li>
+      )
+   });
    return (
       <div>
          {/* Start Banner Area */}
@@ -6,13 +62,12 @@ function Checkout() {
             <div className="container">
                <div className="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
                   <div className="col-first">
-                     <h1>Checkout</h1>
+                     <h1>Thanh toán</h1>
                      <nav className="d-flex align-items-center">
-                        <a href="index.html">
-                           Home
-                           <span className="lnr lnr-arrow-right" />
-                        </a>
-                        <a href="single-product.html">Checkout</a>
+                        <NavLink exact="true" activeclass="active " to="/" className="nav-item">
+                           Trang chủ <span className="lnr lnr-arrow-right"></span>
+                        </NavLink>
+                        <a href="#a">Thanh toán</a>
                      </nav>
                   </div>
                </div>
@@ -22,10 +77,10 @@ function Checkout() {
          {/*================Checkout Area =================*/}
          <section className="checkout_area section_gap">
             <div className="container">
-               <div className="returning_customer">
+               {/* <div className="returning_customer">
                   <div className="check_title">
                      <h2>
-                        Returning Customer? <a href="#">Click here to login</a>
+                        Returning Customer? <NavLink to="/login">Nhấn vào đây để đăng nhập</NavLink>
                      </h2>
                   </div>
                   <p>
@@ -79,222 +134,125 @@ function Checkout() {
                   <a className="tp_btn" href="#">
                      Apply Coupon
                   </a>
-               </div>
+               </div> */}
                <div className="billing_details">
                   <div className="row">
-                     <div className="col-lg-8">
-                        <h3>Billing Details</h3>
-                        <form
-                           className="row contact_form"
-                           action="#"
-                           method="post"
-                           noValidate="novalidate"
-                        >
-                           <div className="col-md-6 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="first"
-                                 name="name"
-                              />
-                              <span className="placeholder" data-placeholder="First name" />
+                     <div className="col-lg-7">
+                        <h3>Thông tin vận chuyển</h3>
+                        <form id="customer-info-form" className="row contact_form" noValidate="novalidate">
+                           <div className="col-md-12 form-group">
+                              <input type="text" className="form-control" id="customer_name" name="customer_name" placeholder="Tên khách hàng" ref={refCustomerName}/>
                            </div>
-                           <div className="col-md-6 form-group p_star">
+                           <div className="col-md-6 form-group">
                               <input
                                  type="text"
                                  className="form-control"
-                                 id="last"
-                                 name="name"
+                                 id="customer_phone"
+                                 name="customer_phone"
+                                 placeholder="Số điện thoại"
+                                 ref={refCustomerPhone}
                               />
-                              <span className="placeholder" data-placeholder="Last name" />
+                           </div>
+                           <div className="col-md-6 form-group">
+                              <input
+                                 type="email"
+                                 className="form-control"
+                                 id="customer_email"
+                                 name="customer_email"
+                                 placeholder="Email"
+                                 ref={refCustomerEmail}
+                              />
                            </div>
                            <div className="col-md-12 form-group">
                               <input
                                  type="text"
                                  className="form-control"
-                                 id="company"
-                                 name="company"
-                                 placeholder="Company name"
+                                 id="detail_address"
+                                 name="detail_address"
+                                 placeholder="Địa chỉ"
+                                 ref={refCustomerAddress}
                               />
                            </div>
-                           <div className="col-md-6 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="number"
-                                 name="number"
-                              />
-                              <span className="placeholder" data-placeholder="Phone number" />
-                           </div>
-                           <div className="col-md-6 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="email"
-                                 name="compemailany"
-                              />
-                              <span
-                                 className="placeholder"
-                                 data-placeholder="Email Address"
-                              />
-                           </div>
-                           <div className="col-md-12 form-group p_star">
-                              <select className="country_select">
-                                 <option value={1}>Country</option>
-                                 <option value={2}>Country</option>
-                                 <option value={4}>Country</option>
-                              </select>
-                           </div>
-                           <div className="col-md-12 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="add1"
-                                 name="add1"
-                              />
-                              <span
-                                 className="placeholder"
-                                 data-placeholder="Address line 01"
-                              />
-                           </div>
-                           <div className="col-md-12 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="add2"
-                                 name="add2"
-                              />
-                              <span
-                                 className="placeholder"
-                                 data-placeholder="Address line 02"
-                              />
-                           </div>
-                           <div className="col-md-12 form-group p_star">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="city"
-                                 name="city"
-                              />
-                              <span className="placeholder" data-placeholder="Town/City" />
-                           </div>
-                           <div className="col-md-12 form-group p_star">
-                              <select className="country_select">
-                                 <option value={1}>District</option>
-                                 <option value={2}>District</option>
-                                 <option value={4}>District</option>
-                              </select>
-                           </div>
+
+                           <LocationSelect />
+
                            <div className="col-md-12 form-group">
-                              <input
-                                 type="text"
-                                 className="form-control"
-                                 id="zip"
-                                 name="zip"
-                                 placeholder="Postcode/ZIP"
-                              />
-                           </div>
-                           <div className="col-md-12 form-group">
-                              <div className="creat_account">
-                                 <input type="checkbox" id="f-option2" name="selector" />
-                                 <label htmlFor="f-option2">Create an account?</label>
-                              </div>
-                           </div>
-                           <div className="col-md-12 form-group">
-                              <div className="creat_account">
-                                 <h3>Shipping Details</h3>
+                              {/* <div className="creat_account">
+                                 <h3>Chi tiết vận chuyển</h3>
                                  <input type="checkbox" id="f-option3" name="selector" />
                                  <label htmlFor="f-option3">
                                     Ship to a different address?
                                  </label>
-                              </div>
+                              </div> */}
                               <textarea
                                  className="form-control"
                                  name="message"
                                  id="message"
                                  rows={1}
-                                 placeholder="Order Notes"
+                                 placeholder="Ghi chú"
                                  defaultValue={""}
+                                 ref={refCustomerNote}
                               />
                            </div>
                         </form>
                      </div>
-                     <div className="col-lg-4">
+                     <div className="col-lg-5">
                         <div className="order_box">
-                           <h2>Your Order</h2>
+                           <h2>Đơn hàng của bạn</h2>
                            <ul className="list">
                               <li>
-                                 <a href="#">
-                                    Product <span>Total</span>
+                                 <a>
+                                    <strong>Sản phẩm <span>Thành tiền</span></strong>
                                  </a>
                               </li>
-                              <li>
-                                 <a href="#">
-                                    Fresh Blackberry <span className="middle">x 02</span>{" "}
-                                    <span className="last">$720.00</span>
-                                 </a>
-                              </li>
-                              <li>
-                                 <a href="#">
-                                    Fresh Tomatoes <span className="middle">x 02</span>{" "}
-                                    <span className="last">$720.00</span>
-                                 </a>
-                              </li>
-                              <li>
-                                 <a href="#">
-                                    Fresh Brocoli <span className="middle">x 02</span>{" "}
-                                    <span className="last">$720.00</span>
-                                 </a>
-                              </li>
+                              {itemForCheckout}
                            </ul>
                            <ul className="list list_2">
                               <li>
-                                 <a href="#">
-                                    Subtotal <span>$2160.00</span>
+                                 <a>
+                                    Tổng tiền <span>{Total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                  </a>
                               </li>
                               <li>
-                                 <a href="#">
-                                    Shipping <span>Flat rate: $50.00</span>
+                                 <a>
+                                    Phí vận chuyển <span>Miễn phí</span>
                                  </a>
                               </li>
                               <li>
-                                 <a href="#">
-                                    Total <span>$2210.00</span>
+                                 <a>
+                                    Tổng thanh toán <span>{Total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                  </a>
                               </li>
                            </ul>
                            <div className="payment_item">
                               <div className="radion_btn">
-                                 <input type="radio" id="f-option5" name="selector" />
-                                 <label htmlFor="f-option5">Check payments</label>
+                                 <input type="radio" id="f-option5" name="selector" defaultChecked/>
+                                 <label htmlFor="f-option5">COD</label>
                                  <div className="check" />
                               </div>
                               <p>
-                                 Please send a check to Store Name, Store Street, Store Town,
-                                 Store State / County, Store Postcode.
+                                 Thanh toán khi nhận hàng
                               </p>
                            </div>
                            <div className="payment_item active">
                               <div className="radion_btn">
-                                 <input type="radio" id="f-option6" name="selector" />
-                                 <label htmlFor="f-option6">Paypal </label>
+                                 <input type="radio" id="f-option6" name="selector" disabled/>
+                                 <label htmlFor="f-option6">VISA </label>
                                  <img src="img/product/card.jpg" alt="" />
                                  <div className="check" />
                               </div>
                               <p>
-                                 Pay via PayPal; you can pay with your credit card if you don’t
-                                 have a PayPal account.
+                                 Tạm thời chưa hỗ trợ
                               </p>
                            </div>
-                           <div className="creat_account">
+                           {/* <div className="creat_account">
                               <input type="checkbox" id="f-option4" name="selector" />
                               <label htmlFor="f-option4">I’ve read and accept the </label>
                               <a href="#">terms &amp; conditions*</a>
-                           </div>
-                           <a className="primary-btn" href="#">
-                              Proceed to Paypal
-                           </a>
+                           </div> */}
+                           <button className="primary-btn" onClick={checkout}>
+                              Đặt hàng
+                           </button>
                         </div>
                      </div>
                   </div>
@@ -306,4 +264,15 @@ function Checkout() {
    )
 }
 
-export default Checkout;
+const mapDispatch = (dispatch) => {
+   return {
+
+   };
+};
+
+const mapState = (state) => {
+   return {
+      itemInCart: state.cart
+   };
+};
+export default connect(mapState, mapDispatch)(Checkout);
