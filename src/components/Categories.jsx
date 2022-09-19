@@ -25,7 +25,7 @@ const Categories = (props) => {
       if (params.id == e.id_cat) {
          // statement
          listCate.push(
-            <div className="col-lg-4 col-md-6" key={e.id} >
+            <div className="col-lg-4 col-md-6" key={e._id} >
                <SingleProduct prod={e} />
             </div>
          );

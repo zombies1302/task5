@@ -13,7 +13,7 @@ function SingleProduct(props) {
   const addToCart = (data) => {
     if (props.cart == 0) {
       data = {
-        _id: data._id,
+        productId: data._id,
         quantity: 1,
         name: data.name,
         price: data.price_sale,
@@ -23,7 +23,7 @@ function SingleProduct(props) {
     } else {
       let check = false;
       props.cart.map((item, key) => {
-        if (item._id == data._id) {
+        if (item.productId == data._id) {
           // statement
           props.cart[key].quantity++;
           // console.log("cộng data nè")
@@ -33,7 +33,7 @@ function SingleProduct(props) {
       if (!check) {
         // statement
         let cart = {
-          _id: data._id,
+          productId: data._id,
           quantity: 1,
           name: data.name,
           price: data.price_sale,

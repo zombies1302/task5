@@ -15,6 +15,10 @@ import Login from "./components/Login";
 import Categories from "./components/Categories";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
+import Testupload from "./components/Testupload";
+import Comfirmation from "./components/Comfirmation";
+
+
 
 
 function App(props) {
@@ -146,6 +150,10 @@ title="Close Search"
 <Route path='/checkout' exact="true" element={<Checkout />} />
 
 <Route path='/categories/:id' exact="true" element={<Categories />} />
+<Route path='/comfirmation/:id' exact="true" element={<Comfirmation />} />
+
+<Route path='/upload' exact="true" element={<Testupload />} />
+
 
 </Routes>
 </main>

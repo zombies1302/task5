@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from 'react-redux';
-import { actQuantityItem } from "../actions/actCart";
+
 import { Confirm } from 'notiflix/build/notiflix-confirm-aio';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
+import { actQuantityItem } from "../actions/actCart";
 
 function Cart(props) {
   useEffect(() => {
@@ -23,7 +25,7 @@ function Cart(props) {
   const handelQuantity = (definition, id) => {
     if (definition === "+") {
       props.cart.map((item, key) => {
-        if (item._id == id) {
+        if (item.productId == id) {
           props.cart[key].quantity++;
           props.editItemCart(props.cart)
           reset()
@@ -32,7 +34,7 @@ function Cart(props) {
       })
     } else {
       props.cart.map((item, key) => {
-        if (item._id == id) {
+        if (item.productId == id) {
           if (props.cart[key].quantity > 1) {
             props.cart[key].quantity--;
             console.log(props.cart)
@@ -80,16 +82,16 @@ function Cart(props) {
       <img style={{ maxWidth: '80px' }} src={'/assets/image/' + s.images} alt="" />
       </div>
       <div className="media-body text-danger">
-      <strong><NavLink to={"/product/" + s._id}>{s.name}</NavLink></strong>
+      <strong><NavLink to={"/product/" + s.productId}>{s.name}</NavLink></strong>
       </div>
       </div>
       </td>
       <td><h5>{s.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5></td>
       <td>
       <div className="product_count">
-      <input onChange={() => onChangeItem(s._id)} type="text" name="qty" id="sst" maxLength={12} value={s.quantity} title="Quantity:" className="input-text qty" />
-      <button className="increase items-count" type="button" onClick={() => handelQuantity("+", s._id)}><i className="lnr lnr-chevron-up" /></button>
-      <button className="reduced items-count" type="button" onClick={() => handelQuantity("-", s._id)}><i className="lnr lnr-chevron-down" /></button>
+      <input onChange={() => onChangeItem(s.productId)} type="text" name="qty" id="sst" maxLength={12} value={s.quantity} title="Quantity:" className="input-text qty" />
+      <button className="increase items-count" type="button" onClick={() => handelQuantity("+", s.productId)}><i className="lnr lnr-chevron-up" /></button>
+      <button className="reduced items-count" type="button" onClick={() => handelQuantity("-", s.productId)}><i className="lnr lnr-chevron-down" /></button>
       </div>
       </td>
       <td>
